@@ -10,6 +10,7 @@ torch-summary = "*"
 tqdm = "*"
 pandas = "*"
 efficientnet-pytorch = "*"
+adabelief-pytorch = "==0.2.0"
 
 [dev-packages]
 

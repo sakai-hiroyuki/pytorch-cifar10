@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6d7ea3a6e81e4570c84b2032df270e475995fd0650b7db3d7d2e065b0d76781a"
+            "sha256": "722fb06a1d159df14cc2d7bfe537506cc9aaffa75efb2cace30f32543c2246e4"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,22 @@
         ]
     },
     "default": {
+        "adabelief-pytorch": {
+            "hashes": [
+                "sha256:091339824d70bfa74d4744902e85e5e2dc41b0e1110a41570e1d3928e534e51a",
+                "sha256:c0ad14936ac5adaa5103e5247595ac3956beca522222fae4a5c7d99140f07b11"
+            ],
+            "index": "pypi",
+            "version": "==0.2.0"
+        },
+        "colorama": {
+            "hashes": [
+                "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b",
+                "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"
+            ],
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+            "version": "==0.4.4"
+        },
         "efficientnet-pytorch": {
             "hashes": [
                 "sha256:00b9b261effce59d2d47aae2ad238c29a2a65175470f41ada7ecac439b7c1ee1"
@@ -142,6 +158,13 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.16.0"
+        },
+        "tabulate": {
+            "hashes": [
+                "sha256:d7c013fe7abbc5e491394e10fa845f8f32fe54f8dc60c6622c6cf482d25d47e4",
+                "sha256:eb1d13f25760052e8931f2ef80aaf6045a6cceb47514db8beab24cded16f13a7"
+            ],
+            "version": "==0.8.9"
         },
         "torch": {
             "hashes": [
