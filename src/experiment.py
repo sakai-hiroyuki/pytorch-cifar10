@@ -8,20 +8,22 @@ import torch
 from torch import nn
 from torch.cuda import is_available
 from torch.utils.data import DataLoader
-from torch.optim import Adam
 
 from torchvision.datasets import CIFAR10
-from torchvision.transforms import ToTensor
+from torchvision.transforms import ToTensor, Compose
 
-from efficientnet_pytorch import EfficientNet
-from torchsummary import summary
+from utils import Cutout
 
 __all__ = ['experiment']
 
 
-def prepare_data(data_dir, batch_size=256):
-    train_data = CIFAR10(data_dir, train=True, download=True, transform=ToTensor())
-    test_data = CIFAR10(data_dir, train=False, download=False, transform=ToTensor())
+def prepare_data(data_dir, batch_size=256, cutout=False):
+    train_transforms = [ToTensor()]
+    if cutout:
+        train_transforms.append(Cutout(1, 16))
+    train_data = CIFAR10(data_dir, train=True, download=True, transform=Compose(train_transforms))
+    test_transforms = [ToTensor()]
+    test_data = CIFAR10(data_dir, train=False, download=False, transform=Compose(test_transforms))
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
     return train_loader, test_loader
@@ -31,6 +33,8 @@ def experiment(
     model,
     optimizer,
     max_epoch=100,
+    batch_size=256,
+    cutout=False,
     data_dir='./data',
     csv_dir='results/csv',
     csv_name=None,
@@ -57,7 +61,7 @@ def experiment(
     if not os.path.isdir(prm_dir):
         os.makedirs(prm_dir)
 
-    loaders = prepare_data(data_dir)
+    loaders = prepare_data(data_dir, batch_size=batch_size, cutout=cutout)
     train_loader = loaders[0]
     test_loader = loaders[1]
 
