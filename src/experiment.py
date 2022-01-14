@@ -79,7 +79,7 @@ def experiment(
             df.to_csv(os.path.join(csv_dir, csv_name), mode='a', header=header, index=None)
 
 
-def train(model, optimizer, train_loader, device, use_tqdm=True):
+def train(model, optimizer, train_loader, device, use_tqdm=False):
     model.train()
     criterion = nn.CrossEntropyLoss()
     i = 0
