@@ -1,6 +1,6 @@
 # pytorch-cifar10
 
-# References
+## References
 ```bibtex
 @article{
   title={Improved regularization of convolutional neural networks with cutout},
