@@ -1,12 +1,13 @@
+import os
+from pathlib import Path
 import pandas as pd
 from matplotlib import pyplot as plt
 
 
 if __name__ == '__main__':
-    opt_dict = {
-        'adam': 'results/csv/efficientnet-b0/adam.csv',
-    }
-
+    pathlist = Path('results/csv').glob('**/*.csv')
+    opt_dict = {os.path.splitext(os.path.basename(path.name))[0]: path for path in pathlist}
+    
     fig, axes = plt.subplots(2, 2, tight_layout=True)
     for opt_name in opt_dict:
         df = pd.read_csv(opt_dict[opt_name])

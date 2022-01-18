@@ -35,7 +35,7 @@ if __name__ == '__main__':
         model._fc = nn.Linear(model._fc.in_features, 10)
         summary(model, [3, 32, 32])
 
-        optimizer = opt_dict[opt_name](model.parameters(), lr=1e-3, betas=(0.9, 0.999))
+        optimizer = opt_dict[opt_name](model.parameters(), lr=1e-3)
 
         if cutout:
             csv_name = f'{opt_name}+cutout.csv'
