@@ -179,7 +179,7 @@ if __name__ == '__main__':
  
     pt_name = f'{args.optimizer}.pt'
     if args.cutout:
-        pt_name = pt_name[0:-3] + 'cutout.pt'
+        pt_name = pt_name[0:-3] + '+cutout.pt'
 
     run(
         model = model,
