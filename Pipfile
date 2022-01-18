@@ -12,6 +12,7 @@ pandas = "*"
 efficientnet-pytorch = "*"
 adabelief-pytorch = "==0.2.0"
 matplotlib = "*"
+sklearn = "*"
 
 [dev-packages]
 

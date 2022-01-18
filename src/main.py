@@ -42,18 +42,18 @@ def run(
     data_dir='./data',
     csv_dir='results/csv',
     csv_name=None,
-    pt_dir='results/pt',
-    pt_name=None
+    pth_dir='results/pth',
+    pth_name=None
 ):
     if csv_name is None:
         csv_name = f'record.csv'
-    if pt_name is None:
-        pt_name = f'model.pt'
+    if pth_name is None:
+        pth_name = f'model.pth'
 
     # モデルが存在するならロードする.
-    if os.path.isfile(os.path.join(pt_dir, pt_name)):
-        print(f'{os.path.join(pt_dir, pt_name)} already exists.')
-        model.load_state_dict(torch.load(os.path.join(pt_dir, pt_name)))
+    if os.path.isfile(os.path.join(pth_dir, pth_name)):
+        print(f'{os.path.join(pth_dir, pth_name)} already exists.')
+        model.load_state_dict(torch.load(os.path.join(pth_dir, pth_name)))
     
     device = 'cuda:0' if is_available() else 'cpu'
     model = model.to(device)
@@ -62,8 +62,8 @@ def run(
         os.makedirs(data_dir)
     if not os.path.isdir(csv_dir):
         os.makedirs(csv_dir)
-    if not os.path.isdir(pt_dir):
-        os.makedirs(pt_dir)
+    if not os.path.isdir(pth_dir):
+        os.makedirs(pth_dir)
 
     loaders = prepare_data(data_dir, batch_size=batch_size, cutout=cutout)
     train_loader = loaders[0]
@@ -74,7 +74,7 @@ def run(
         test_loss, test_acc = eval(model, test_loader, device)
 
         # モデルの保存, 上書き
-        torch.save(model.to('cpu').state_dict(), os.path.join(pt_dir, pt_name))
+        torch.save(model.to('cpu').state_dict(), os.path.join(pth_dir, pth_name))
         model.to(device)
 
         # csvへの出力, 上書き
@@ -156,30 +156,32 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=256)
     parser.add_argument('--cutout', action='store_true')
     parser.add_argument('--csv_dir', type=str, default='results/csv')
-    parser.add_argument('--pt_dir', type=str, default='results/pt')
-    parser.add_argument('--optimizer', type=str, default='sgd')
+    parser.add_argument('--pth_dir', type=str, default='results/pth')
+    parser.add_argument('--optimizer', type=str, default='momentum')
     args = parser.parse_args()
 
     opt_dict = {
-        'adam': Adam,
-        'sgd': SGD,
-        'adabelief': AdaBelief
+        'sgd': (SGD, {'lr': 1e-3}),
+        'momentum': (SGD, {'lr': 1e-3, 'momentum': 0.9}),
+        'adam': (Adam, {'lr': 1e-3}),
+        'amsgrad': (Adam, {'lr': 1e-3, 'amsgrad': True}),
+        'adabelief': (AdaBelief, {'lr': 1e-3}),
     }
-
 
     model = EfficientNet.from_pretrained('efficientnet-b0')
     model._fc = nn.Linear(model._fc.in_features, 10)
     summary(model, [3, 32, 32])
 
-    optimizer = opt_dict[args.optimizer](model.parameters(), lr=1e-3)
+    optimizer = opt_dict[args.optimizer][0](model.parameters(), **opt_dict[args.optimizer][1])
+    print(optimizer)
 
     csv_name = f'{args.optimizer}.csv'
     if args.cutout:
         csv_name = csv_name[0:-4] + '+cutout.csv'
  
-    pt_name = f'{args.optimizer}.pt'
+    pth_name = f'{args.optimizer}.pth'
     if args.cutout:
-        pt_name = pt_name[0:-3] + '+cutout.pt'
+        pth_name = pth_name[0:-3] + '+cutout.pth'
 
     run(
         model = model,
@@ -189,6 +191,6 @@ if __name__ == '__main__':
         cutout = args.cutout,
         csv_dir = args.csv_dir,
         csv_name = csv_name,
-        pt_dir = args.pt_dir,
-        pt_name = pt_name,
+        pth_dir = args.pth_dir,
+        pth_name = pth_name,
     )
