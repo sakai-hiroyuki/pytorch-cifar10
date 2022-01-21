@@ -1,5 +1,15 @@
 # pytorch-cifar10
 
+## Optimizers
+|Optimizer|Implementation|
+|----|:----:|
+|SGD|https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD|
+|Momentum|https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD|
+|RMSprop|https://pytorch.org/docs/stable/generated/torch.optim.RMSprop.html#torch.optim.RMSprop|
+|[Adam](https://arxiv.org/abs/1412.6980)|https://pytorch.org/docs/stable/generated/torch.optim.Adam.html|
+|[AMSGrad](https://arxiv.org/abs/1904.09237)|https://pytorch.org/docs/stable/generated/torch.optim.Adam.html|
+|[AdaBelief](https://arxiv.org/abs/2010.07468)|https://github.com/juntang-zhuang/Adabelief-Optimizer|
+
 ## References
 ```bibtex
 @book{
