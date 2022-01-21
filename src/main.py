@@ -164,12 +164,12 @@ class ExperimentCIFAR10:
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--max_epoch', type=int, default=100)
-    parser.add_argument('--batch_size', type=int, default=1024)
+    parser.add_argument('-e', '--max_epoch', type=int, default=100)
+    parser.add_argument('-b', '--batch_size', type=int, default=1024)
+    parser.add_argument('-o', '--optimizer', type=str, default='momentum')
     parser.add_argument('--cutout', action='store_true')
-    parser.add_argument('--csv_dir', type=str, default='results/csv')
-    parser.add_argument('--pth_dir', type=str, default='results/pth')
-    parser.add_argument('--optimizer', type=str, default='momentum')
+    parser.add_argument('-csv', '--csv_dir', type=str, default='results/csv')
+    parser.add_argument('-pth', '--pth_dir', type=str, default='results/pth')
     args = parser.parse_args()
 
     opt_dict = {
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     experiment = ExperimentCIFAR10(
         model = model,
         optimizer = optimizer,
-        scheduler=None,
+        scheduler = None,
         max_epoch = args.max_epoch,
         batch_size = args.batch_size,
         cutout = args.cutout,
