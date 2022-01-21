@@ -95,12 +95,16 @@ class ExperimentCIFAR10:
 
             # csvへの出力, 上書き
             record = [[train_loss, train_acc, train_time, test_loss, test_acc]]
+            print(record)
             df = pd.DataFrame(record, columns=None, index=None)
             if os.path.isfile(os.path.join(self.csv_dir, self.csv_name)):
                 df.to_csv(os.path.join(self.csv_dir, self.csv_name), mode='a', header=None, index=None)
             else:
                 header = ['train_loss', 'train_acc', 'train_time', 'test_loss', 'test_acc']
                 df.to_csv(os.path.join(self.csv_dir, self.csv_name), mode='a', header=header, index=None)
+
+            if self.scheduler:
+                self.scheduler.step()
 
     def train(self, train_loader):
         self.model.train()
