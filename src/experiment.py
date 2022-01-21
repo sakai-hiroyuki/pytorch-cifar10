@@ -8,9 +8,8 @@ from torch import nn
 from torch.cuda import is_available
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
-from torchvision.transforms import ToTensor, Compose
 
-from utils import Cutout
+from torchvision.transforms import Compose, ToTensor, Normalize, RandomHorizontalFlip, RandomCrop
 
 
 class ExperimentCIFAR10:
@@ -37,7 +36,6 @@ class ExperimentCIFAR10:
         self.scheduler = scheduler
         self.max_epoch = max_epoch
         self.batch_size = batch_size
-        self.cutout = cutout
         self.data_dir = data_dir
         self.csv_dir = csv_dir
         self.csv_name = csv_name
@@ -51,13 +49,17 @@ class ExperimentCIFAR10:
         self.run()
 
     def prepare_data(self):
-        train_transforms = [ToTensor()]
-        if self.cutout:
-            train_transforms.append(Cutout(1, 16))
-        train_data = CIFAR10(self.data_dir, train=True, download=True, transform=Compose(train_transforms))
-        
-        test_transforms = [ToTensor()]
-        test_data = CIFAR10(self.data_dir, train=False, download=False, transform=Compose(test_transforms))
+        stats = ((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+        train_transforms = Compose([
+            RandomCrop(32, padding=4, padding_mode='reflect'), 
+            RandomHorizontalFlip(), 
+            ToTensor(), 
+            Normalize(*stats,inplace=True)]
+        )
+        test_transforms = Compose([ToTensor(), Normalize(*stats)])
+
+        train_data = CIFAR10(self.data_dir, train=True, download=True, transform=train_transforms)        
+        test_data = CIFAR10(self.data_dir, train=False, download=False, transform=test_transforms)
         
         train_loader = DataLoader(train_data, batch_size=self.batch_size, shuffle=True)
         test_loader = DataLoader(test_data, batch_size=self.batch_size, shuffle=False)
