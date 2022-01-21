@@ -34,7 +34,8 @@ class ExperimentCIFAR10:
         csv_dir='results/csv',
         csv_name='record.csv',
         pth_dir='results/pth',
-        pth_name='params.pth'
+        pth_name='params.pth',
+        use_tqdm=True
     ) -> None:
 
         self.model = model
@@ -48,32 +49,33 @@ class ExperimentCIFAR10:
         self.csv_name = csv_name
         self.pth_dir = pth_dir
         self.pth_name = pth_name
+        self.use_tqdm = use_tqdm
 
         self.device = 'cuda:0' if is_available() else 'cpu'
     
     def __call__(self):
         self.run()
 
-    def prepare_data(self, data_dir, batch_size=1024, cutout=False):
+    def prepare_data(self):
         train_transforms = [ToTensor()]
-        if cutout:
+        if self.cutout:
             train_transforms.append(Cutout(1, 16))
-        train_data = CIFAR10(data_dir, train=True, download=True, transform=Compose(train_transforms))
+        train_data = CIFAR10(self.data_dir, train=True, download=True, transform=Compose(train_transforms))
+        
         test_transforms = [ToTensor()]
-        test_data = CIFAR10(data_dir, train=False, download=False, transform=Compose(test_transforms))
-        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
+        test_data = CIFAR10(self.data_dir, train=False, download=False, transform=Compose(test_transforms))
+        
+        train_loader = DataLoader(train_data, batch_size=self.batch_size, shuffle=True)
+        test_loader = DataLoader(test_data, batch_size=self.batch_size, shuffle=False)
         return train_loader, test_loader
     
     def run(self):
-        model = self.model.to(self.device)
-        optimizer = self.optimizer
-        scheduler = self.scheduler
+        self.model = self.model.to(self.device)
 
         # パラメータが存在するならロードする.
         if os.path.isfile(os.path.join(self.pth_dir, self.pth_name)):
             print(f'{os.path.join(self.pth_dir, self.pth_name)} already exists.')
-            model.load_state_dict(torch.load(os.path.join(self.pth_dir, self.pth_name)))
+            self.model.load_state_dict(torch.load(os.path.join(self.pth_dir, self.pth_name)))
 
         if not os.path.isdir(self.data_dir):
             os.makedirs(self.data_dir)
@@ -86,13 +88,16 @@ class ExperimentCIFAR10:
         train_loader = loaders[0]
         test_loader = loaders[1]
 
-        for _ in tqdm(range(self.max_epoch)):
+        epochs = range(self.max_epoch)
+        if self.use_tqdm:
+            epochs = tqdm(epochs)
+        for _ in epochs:
             train_loss, train_acc, train_time = self.train(train_loader)
             test_loss, test_acc = self.eval(test_loader)
 
             # モデルの保存, 上書き
-            torch.save(model.to('cpu').state_dict(), os.path.join(self.pth_dir, self.pth_name))
-            model.to(self.device)
+            torch.save(self.model.to('cpu').state_dict(), os.path.join(self.pth_dir, self.pth_name))
+            self.model.to(self.device)
 
             # csvへの出力, 上書き
             record = [[train_loss, train_acc, train_time, test_loss, test_acc]]
