@@ -8,7 +8,7 @@ import torch
 from torch import nn
 from torch.cuda import is_available
 from torch.utils.data import DataLoader
-from torch.optim import Adam, SGD
+from torch.optim import Adam, SGD, RMSprop
 from torchvision.datasets import CIFAR10
 from torchvision.transforms import ToTensor, Compose
 
@@ -21,7 +21,7 @@ from utils import Cutout
 
 class ExperimentCIFAR10:
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-    
+
     def __init__(
         self,
         model,
@@ -175,6 +175,7 @@ if __name__ == '__main__':
     opt_dict = {
         'sgd': (SGD, {'lr': 1e-3}),
         'momentum': (SGD, {'lr': 1e-3, 'momentum': 0.9}),
+        'rmsprop': (RMSprop, {'lr': 1e-3}),
         'adam': (Adam, {'lr': 1e-3}),
         'amsgrad': (Adam, {'lr': 1e-3, 'amsgrad': True}),
         'adabelief': (AdaBelief, {'lr': 1e-3}),
@@ -187,13 +188,15 @@ if __name__ == '__main__':
     optimizer = opt_dict[args.optimizer][0](model.parameters(), **opt_dict[args.optimizer][1])
     print(optimizer)
 
+    scheduler = None
+
     csv_name = f'{args.optimizer}.csv'
     if args.cutout:
         csv_name = csv_name[0:-4] + '+cutout.csv'
  
     pth_name = f'{args.optimizer}.pth'
     if args.cutout:
-        pth_name = pth_name[0:-3] + '+cutout.pth'
+        pth_name = pth_name[0:-4] + '+cutout.pth'
 
     experiment = ExperimentCIFAR10(
         model = model,
