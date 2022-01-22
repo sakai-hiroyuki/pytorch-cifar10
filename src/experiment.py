@@ -22,7 +22,6 @@ class ExperimentCIFAR10:
         scheduler=None,
         max_epoch=100,
         batch_size=1024,
-        cutout=False,
         data_dir='./data',
         csv_dir='results/csv',
         csv_name='record.csv',

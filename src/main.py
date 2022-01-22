@@ -45,14 +45,9 @@ if __name__ == '__main__':
     print(optimizer)
 
     scheduler = None
-
-    csv_name = f'{args.optimizer}.csv'
-    if args.cutout:
-        csv_name = csv_name[0:-4] + '+cutout.csv'
- 
-    pth_name = f'{args.optimizer}.pth'
-    if args.cutout:
-        pth_name = pth_name[0:-4] + '+cutout.pth'
+    
+    csv_name = f'{args.optimizer[0]}.csv'
+    pth_name = f'{args.optimizer[0]}.pth'
 
     experiment = ExperimentCIFAR10(
         model = model,
@@ -60,7 +55,6 @@ if __name__ == '__main__':
         scheduler = None,
         max_epoch = args.max_epoch,
         batch_size = args.batch_size,
-        cutout = args.cutout,
         csv_dir = args.csv_dir,
         csv_name = csv_name,
         pth_dir = args.pth_dir,

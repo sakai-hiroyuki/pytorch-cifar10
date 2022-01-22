@@ -1,7 +1,6 @@
 from torch.optim import SGD
 from torch.optim.lr_scheduler import MultiStepLR
 from torchsummary import summary
-from torchvision.transforms import Compose, ToTensor, Normalize, RandomHorizontalFlip, RandomCrop
 
 from experiment import ExperimentCIFAR10
 from models import resnet20_cifar10
@@ -20,11 +19,10 @@ if __name__ == '__main__':
         scheduler = scheduler,
         max_epoch = 300,
         batch_size = 128,
-        cutout = False,
         csv_dir = '.',
-        csv_name = 'test_residual.csv',
+        csv_name = 'test_resnet.csv',
         pth_dir = '.',
-        pth_name = 'test_residual.pth',
+        pth_name = 'test_resnet.pth',
         use_tqdm=True,
     )
 
