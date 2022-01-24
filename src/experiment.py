@@ -21,7 +21,7 @@ class ExperimentCIFAR10:
         optimizer,
         scheduler=None,
         max_epoch=100,
-        batch_size=1024,
+        batch_size=512,
         data_dir='./data',
         csv_dir='results/csv',
         csv_name='record.csv',
@@ -138,6 +138,7 @@ class ExperimentCIFAR10:
         train_time = time() - tic
         return train_loss, train_acc, train_time
 
+    @torch.no_grad()
     def eval(self, test_loader):
         self.model.eval()
         
@@ -147,21 +148,19 @@ class ExperimentCIFAR10:
         correct = 0    # 正しく分類されたテストデータの数
         running_loss = 0.0  # 予測損失の合計
 
-        with torch.no_grad():
-            for inputs, labels in test_loader:
-                inputs = inputs.to(self.device)
-                labels = labels.to(self.device)
+        for inputs, labels in test_loader:
+            inputs = inputs.to(self.device)
+            labels = labels.to(self.device)
                     
-                outputs = self.model(inputs)
-                loss = criterion(outputs, labels)
+            outputs = self.model(inputs)
+            loss = criterion(outputs, labels)
 
-                running_loss += loss.item()
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-                i += 1
+            running_loss += loss.item()
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+            i += 1
 
         test_loss = running_loss / i
         test_acc = correct / total
         return test_loss, test_acc
-
