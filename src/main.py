@@ -18,7 +18,6 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--optimizer', type=str, default='momentum')
     parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3)
     parser.add_argument('-wd', '--weight_decay', type=float, default=0.0)
-    parser.add_argument('--cutout', action='store_true')
     parser.add_argument('-csv', '--csv_dir', type=str, default='results/csv')
     parser.add_argument('-pth', '--pth_dir', type=str, default='results/pth')
     args = parser.parse_args()

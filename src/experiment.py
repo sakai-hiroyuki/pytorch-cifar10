@@ -48,14 +48,23 @@ class ExperimentCIFAR10:
         self.run()
 
     def prepare_data(self):
-        stats = ((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
         train_transforms = Compose([
             RandomCrop(32, padding=4, padding_mode='reflect'), 
             RandomHorizontalFlip(), 
             ToTensor(), 
-            Normalize(*stats,inplace=True)]
-        )
-        test_transforms = Compose([ToTensor(), Normalize(*stats)])
+            Normalize(
+                mean=(0.4914, 0.4822, 0.4465),
+                std=(0.2023, 0.1994, 0.2010),
+                inplace=True
+            )
+        ])
+        test_transforms = Compose([
+            ToTensor(),
+            Normalize(
+                mean=(0.4914, 0.4822, 0.4465),
+                std=(0.2023, 0.1994, 0.2010)
+            )
+        ])
 
         train_data = CIFAR10(self.data_dir, train=True, download=True, transform=train_transforms)        
         test_data = CIFAR10(self.data_dir, train=False, download=False, transform=test_transforms)
