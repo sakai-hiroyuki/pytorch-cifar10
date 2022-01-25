@@ -17,6 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--max_epoch', type=int, default=100)
     parser.add_argument('-b', '--batch_size', type=int, default=1024)
     parser.add_argument('-o', '--optimizer', type=str, default='momentum')
+    parser.add_argument('-m', '--model', type=str, default='resnet20-cifar10')
     parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3)
     parser.add_argument('-wd', '--weight_decay', type=float, default=0.0)
     parser.add_argument('-csv', '--csv_dir', type=str, default='results/csv')
@@ -32,8 +33,13 @@ if __name__ == '__main__':
         'adabelief': (AdaBelief, {}),
     }
 
-    model = EfficientNet.from_pretrained('efficientnet-b0')
-    model._fc = nn.Linear(model._fc.in_features, 10)
+    if args.model == 'efficientnet-b0':
+        model = EfficientNet.from_pretrained('efficientnet-b0')
+        model._fc = nn.Linear(model._fc.in_features, 10)
+    elif args.model == 'resnet20-cifar10':
+        model = resnet20_cifar10()
+    else:
+        raise ValueError(f'Invaild model: {args.model}')
     summary(model, [3, 32, 32])
 
     optimizer = optimizer_dict[args.optimizer][0](
@@ -46,8 +52,8 @@ if __name__ == '__main__':
 
     scheduler = None
     
-    csv_name = f'{args.optimizer[0]}.csv'
-    pth_name = f'{args.optimizer[0]}.pth'
+    csv_name = f'{args.optimizer}.csv'
+    pth_name = f'{args.optimizer}.pth'
 
     experiment = ExperimentCIFAR10(
         model = model,
