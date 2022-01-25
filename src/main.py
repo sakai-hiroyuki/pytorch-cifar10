@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from torch import nn
 
 from torch.optim import Adam, SGD, RMSprop
+from torch.optim.lr_scheduler import StepLR
 
 from efficientnet_pytorch import EfficientNet
 from adabelief_pytorch import AdaBelief
@@ -18,6 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--batch_size', type=int, default=1024)
     parser.add_argument('-o', '--optimizer', type=str, default='momentum')
     parser.add_argument('-m', '--model', type=str, default='resnet20-cifar10')
+    parser.add_argument('-s', '--scheduler', type=int, default=0)
     parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3)
     parser.add_argument('-wd', '--weight_decay', type=float, default=0.0)
     parser.add_argument('-csv', '--csv_dir', type=str, default='results/csv')
@@ -50,7 +52,14 @@ if __name__ == '__main__':
     )
     print(optimizer)
 
-    scheduler = None
+    if args.scheduler == 0:
+        scheduler = None
+    elif args.scheduler == 1:
+        scheduler = StepLR(optimizer, step_size=100, gamma=0.1)
+    else:
+        raise ValueError(f'Invaild scheduler: {args.scheduler}')
+    
+    print(f'lr_scheduler: {not args.scheduler == 0}')
     
     csv_name = f'{args.optimizer}.csv'
     pth_name = f'{args.optimizer}.pth'
@@ -58,7 +67,7 @@ if __name__ == '__main__':
     experiment = ExperimentCIFAR10(
         model = model,
         optimizer = optimizer,
-        scheduler = None,
+        scheduler = scheduler,
         max_epoch = args.max_epoch,
         batch_size = args.batch_size,
         csv_dir = args.csv_dir,

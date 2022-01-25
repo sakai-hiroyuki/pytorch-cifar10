@@ -152,9 +152,9 @@ class ExperimentCIFAR10:
         self.model.eval()
         
         criterion = nn.CrossEntropyLoss()
-        i = 0    # ステップ数
-        total = 0    # 全てのテストデータの数
-        correct = 0    # 正しく分類されたテストデータの数
+        i = 0               # ステップ数
+        total = 0           # 全てのテストデータの数
+        correct = 0         # 正しく分類されたテストデータの数
         running_loss = 0.0  # 予測損失の合計
 
         for inputs, labels in test_loader:
