@@ -2,36 +2,40 @@ from argparse import ArgumentParser
 
 from torch import nn
 
-from torch.optim import Adam, SGD, RMSprop
-from torch.optim.lr_scheduler import StepLR
-
+# モデル関連
+from models import resnet20_cifar10
 from efficientnet_pytorch import EfficientNet
-from adabelief_pytorch import AdaBelief
 from torchsummary import summary
 
+# 最適化アルゴリズム関連
+from torch.optim import Adam, SGD, RMSprop
+from adabelief_pytorch import AdaBelief
+
+# 学習率関連
+from torch.optim.lr_scheduler import StepLR
+
 from experiment import ExperimentCIFAR10
-from models import resnet20_cifar10
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-e', '--max_epoch', type=int, default=100)
+    parser.add_argument('-e', '--max_epoch', type=int, default=300)
     parser.add_argument('-b', '--batch_size', type=int, default=1024)
     parser.add_argument('-o', '--optimizer', type=str, default='momentum')
     parser.add_argument('-m', '--model', type=str, default='resnet20-cifar10')
-    parser.add_argument('-s', '--scheduler', type=int, default=0)
-    parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3)
-    parser.add_argument('-wd', '--weight_decay', type=float, default=0.0)
+    parser.add_argument('-s', '--scheduler', type=int, default=1)
+    parser.add_argument('-lr', '--learning_rate', type=float, default=1e-1)
+    parser.add_argument('-wd', '--weight_decay', type=float, default=1e-4)
     parser.add_argument('-csv', '--csv_dir', type=str, default='results/csv')
     parser.add_argument('-pth', '--pth_dir', type=str, default='results/pth')
     args = parser.parse_args()
 
     optimizer_dict = {
-        'sgd': (SGD, {}),
-        'momentum': (SGD, {'momentum': 0.9}),
-        'rmsprop': (RMSprop, {}),
-        'adam': (Adam, {}),
-        'amsgrad': (Adam, {'amsgrad': True}),
+        'sgd'      : (SGD,       {}),
+        'momentum' : (SGD,       {'momentum': 0.9}),
+        'rmsprop'  : (RMSprop,   {}),
+        'adam'     : (Adam,      {}),
+        'amsgrad'  : (Adam,      {'amsgrad': True}),
         'adabelief': (AdaBelief, {}),
     }
 
