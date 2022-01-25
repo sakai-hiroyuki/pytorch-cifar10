@@ -1,1 +1,1 @@
-from .resnet import *
+from .resnet_cifar10 import *

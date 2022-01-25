@@ -9,6 +9,7 @@ from adabelief_pytorch import AdaBelief
 from torchsummary import summary
 
 from experiment import ExperimentCIFAR10
+from models import resnet20_cifar10
 
 
 if __name__ == '__main__':
