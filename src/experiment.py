@@ -19,30 +19,31 @@ class ExperimentCIFAR10:
         self,
         model,
         optimizer,
-        scheduler=None,
-        max_epoch=100,
-        batch_size=512,
-        data_dir='./data',
-        csv_dir='results/csv',
-        csv_name='record.csv',
-        pth_dir='results/pth',
-        pth_name='params.pth',
-        use_tqdm=True
+        scheduler  = None,
+        max_epoch  = 100,
+        batch_size = 512,
+        data_dir   = './data',
+        csv_dir    = 'results/csv',
+        csv_name   = 'record.csv',
+        pth_dir    = 'results/pth',
+        pth_name   = 'params.pth',
+        use_tqdm   = True
     ) -> None:
 
-        self.model = model
-        self.optimizer = optimizer
-        self.scheduler = scheduler
-        self.max_epoch = max_epoch
+        self.model      = model
+        self.optimizer  = optimizer
+        self.scheduler  = scheduler
+        self.max_epoch  = max_epoch
         self.batch_size = batch_size
-        self.data_dir = data_dir
-        self.csv_dir = csv_dir
-        self.csv_name = csv_name
-        self.pth_dir = pth_dir
-        self.pth_name = pth_name
-        self.use_tqdm = use_tqdm
+        self.data_dir   = data_dir
+        self.csv_dir    = csv_dir
+        self.csv_name   = csv_name
+        self.pth_dir    = pth_dir
+        self.pth_name   = pth_name
+        self.use_tqdm   = use_tqdm
 
         self.device = 'cuda:0' if is_available() else 'cpu'
+        self._max_acc = 0.
     
     def __call__(self):
         self.run()
@@ -53,16 +54,16 @@ class ExperimentCIFAR10:
             RandomHorizontalFlip(), 
             ToTensor(), 
             Normalize(
-                mean=(0.4914, 0.4822, 0.4465),
-                std=(0.2023, 0.1994, 0.2010),
-                inplace=True
+                mean = (0.4914, 0.4822, 0.4465),
+                std = (0.2023, 0.1994, 0.2010),
+                inplace = True
             )
         ])
         test_transforms = Compose([
             ToTensor(),
             Normalize(
-                mean=(0.4914, 0.4822, 0.4465),
-                std=(0.2023, 0.1994, 0.2010)
+                mean = (0.4914, 0.4822, 0.4465),
+                std = (0.2023, 0.1994, 0.2010)
             )
         ])
 
@@ -74,7 +75,7 @@ class ExperimentCIFAR10:
         return train_loader, test_loader
     
     def run(self):
-        self.model = self.model.to(self.device)
+        self.model.to(self.device)
 
         # パラメータが存在するならロードする.
         if os.path.isfile(os.path.join(self.pth_dir, self.pth_name)):
@@ -98,23 +99,31 @@ class ExperimentCIFAR10:
         for _ in epochs:
             train_loss, train_acc, train_time = self.train(train_loader)
             test_loss, test_acc = self.eval(test_loader)
-
-            # モデルの保存, 上書き
-            torch.save(self.model.to('cpu').state_dict(), os.path.join(self.pth_dir, self.pth_name))
-            self.model.to(self.device)
-
-            # csvへの出力, 上書き
-            record = [[train_loss, train_acc, train_time, test_loss, test_acc]]
-            print(record)
-            df = pd.DataFrame(record, columns=None, index=None)
-            if os.path.isfile(os.path.join(self.csv_dir, self.csv_name)):
-                df.to_csv(os.path.join(self.csv_dir, self.csv_name), mode='a', header=None, index=None)
-            else:
-                header = ['train_loss', 'train_acc', 'train_time', 'test_loss', 'test_acc']
-                df.to_csv(os.path.join(self.csv_dir, self.csv_name), mode='a', header=header, index=None)
-
+            
             if self.scheduler:
                 self.scheduler.step()
+
+            # csvへの出力, 上書き
+            self.to_csv(train_loss, train_acc, train_time, test_loss, test_acc)
+
+            # モデルの保存, 上書き
+            if self._max_acc < test_acc:
+                torch.save(self.model.to('cpu').state_dict(), os.path.join(self.pth_dir, self.pth_name))
+                self._max_acc = test_acc
+                self.model.to(self.device)
+        
+    def to_csv(self, train_loss, train_acc, train_time, test_loss, test_acc):
+        print()
+        print(f'train loss: {train_loss}, train acc: {train_acc}')
+        print(f'test loss : {test_loss}, test acc : {test_acc}')
+        print(f'best: {self._max_acc < test_acc}')
+
+        df = pd.DataFrame([[train_loss, train_acc, train_time, test_loss, test_acc]], columns=None, index=None)
+        if os.path.isfile(os.path.join(self.csv_dir, self.csv_name)):
+            df.to_csv(os.path.join(self.csv_dir, self.csv_name), mode='a', header=None, index=None)
+        else:
+            header = ['train_loss', 'train_acc', 'train_time', 'test_loss', 'test_acc']
+            df.to_csv(os.path.join(self.csv_dir, self.csv_name), mode='a', header=header, index=None)
 
     def train(self, train_loader):
         self.model.train()

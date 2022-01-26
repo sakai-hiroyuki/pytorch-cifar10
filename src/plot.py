@@ -4,8 +4,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 
-if __name__ == '__main__':
-    pathlist = Path('results/csv').glob('**/*.csv')
+def plot_csv(root):
+    pathlist = Path(root).glob('**/*.csv')
     opt_dict = {os.path.splitext(os.path.basename(path.name))[0]: path for path in pathlist}
     
     fig, axes = plt.subplots(2, 2, tight_layout=True)
@@ -30,3 +30,7 @@ if __name__ == '__main__':
             axes[i, j].grid(axis='both', which='major')
             axes[i, j].legend(loc='lower left')
     plt.show()
+
+
+if __name__ == '__main__':
+    plot_csv('results/csv')
